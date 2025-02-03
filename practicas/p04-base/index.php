@@ -67,6 +67,56 @@
         echo "Luego, \$b también se hace referencia a \$a, por lo que todas apuntan al mismo valor.";
         unset($a, $b, $c);
     ?>
+    <h2>Ejercicio 3</h2>
+    <p>Muestra el contenido de cada variable inmediatamente después de cada asignación,
+       verificar la evolución del tipo de estas variables (imprime todos los componentes de los
+       arreglo):</p>
+    <p>$a = “PHP5”;</br>
+       $z[] = &$a;</br>
+       $b = “5a version de PHP”;</br>
+       $c = $b*10;</br>
+       $a .= $b;</br>
+       $b *= $c;</br>
+       $z[0] = “MySQL”;
+    </p>
+    <?php
+        //AQUI VA MI CÓDIGO PHP
+        echo '<h4>Respuesta:</h4>';
+        $a = "PHP5";
+        echo "<p>Valor de \$a: $a</p>";
+        echo "<p>Tipo de \$a: " . gettype($a) . "</p>";
+
+        $z[] = &$a;
+        echo "<p>Valor de \$z: ";
+        print_r($z);
+        echo "</p>";
+        echo "<p>Tipo de \$z: " . gettype($z) . "</p>";
+
+        $b = "5a version de PHP";
+        echo "<p>Valor de \$b: $b</p>";
+        echo "<p>Tipo de \$b: " . gettype($b) . "</p>";
+
+        $c = $b * 10;
+        echo "<p>Valor de \$c: $c</p>";
+        echo "<p>Tipo de \$c: " . gettype($c) . "</p>";
+
+        $a .= $b;
+        echo "<p>Valor de \$a después de concatenar: $a</p>";
+        echo "<p>Tipo de \$a: " . gettype($a) . "</p>";
+
+        $b *= $c;
+        echo "<p>Valor de \$b después de multiplicar: $b</p>";
+        echo "<p>Tipo de \$b: " . gettype($b) . "</p>";
+
+        $z[0] = "MySQL";
+        echo "<p>Valor de \$z después de modificar: ";
+        print_r($z);
+        echo "</p>";
+        echo "<p>Tipo de \$z: " . gettype($z) . "</p>";
+
+        unset($a, $b, $c, $z);
+    ?>
+    
 
 </body>
 </html>
