@@ -141,7 +141,28 @@
         // Liberar variables
         unset($a, $b, $c, $z);
     ?>
-    
+    <h2>Ejercicio 5</h2>
+    <p>Dar el valor de las variables $a, $b, $c al final del siguiente script:</p>
+    <p>$a = “7 personas”;</br>
+       $b = (integer) $a;</br>
+       $a = “9E3”;</br>
+       $c = (double) $a;</br>
+    </p>
+    <?php
+        //AQUI VA MI CÓDIGO PHP
+        echo '<h4>Respuesta:</h4>';
+        $a = "7 personas";
+        $b = (integer) $a;
+        $a = "9E3";
+        $c = (double) $a;
+
+        echo "Valor de \$a: $a (Tipo: " . gettype($a) . ")<br>";
+        echo "Valor de \$b: $b (Tipo: " . gettype($b) . ")<br>";
+        echo "Valor de \$c: $c (Tipo: " . gettype($c) . ")<br>";
+        
+        unset($a, $b, $c);
+    ?>
+
 
 </body>
 </html>
