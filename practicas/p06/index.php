@@ -45,6 +45,29 @@
     if (isset($_POST['generar'])) {
         generar_matriz();
     }
-?>
+    ?>
+
+    <h2>Ejercicio 3</h2>
+    <p>Utiliza un ciclo while para encontrar el primer número entero obtenido aleatoriamente,
+    pero que además sea múltiplo de un número dado.</p>
+    <form method="get">
+        <label for="multiplo">Ingresa un número para encontrar su múltiplo:</label>
+        <input type="number" name="multiplo" required>
+        <input type="submit" value="Buscar Múltiplo">
+    </form>
+
+    <?php
+    require_once __DIR__ . '/src/funciones.php';
+
+    if (isset($_GET['multiplo']) && is_numeric($_GET['multiplo']) && $_GET['multiplo'] > 0) {
+        $numero_dado = intval($_GET['multiplo']);
+
+        echo "<h3>Usando ciclo WHILE</h3>";
+        encontrar_multiplo_while($numero_dado);
+
+        echo "<h3>Usando ciclo DO-WHILE</h3>";
+        encontrar_multiplo_dowhile($numero_dado);
+    }
+    ?>
 </body>
 </html>

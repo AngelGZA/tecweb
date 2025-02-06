@@ -43,4 +43,25 @@ function generar_matriz() {
     echo "<p><strong>$total_numeros</strong> números obtenidos en <strong>$iteraciones</strong> iteraciones.</p>";
 }
 
+function encontrar_multiplo_while($num) {
+    $contador = 0;
+    $numero_aleatorio = rand(1, 1000);
+
+    while ($numero_aleatorio % $num !== 0) {
+        $numero_aleatorio = rand(1, 1000);
+        $contador++;
+    }
+
+    echo "Primer múltiplo encontrado: <strong>$numero_aleatorio</strong> después de $contador intentos.<br>";
+}
+
+function encontrar_multiplo_dowhile($num) {
+    $contador = 0;
+    do {
+        $numero_aleatorio = rand(1, 1000);
+        $contador++;
+    } while ($numero_aleatorio % $num !== 0);
+
+    echo "Primer múltiplo encontrado: <strong>$numero_aleatorio</strong> después de $contador intentos.<br>";
+}
 ?>
