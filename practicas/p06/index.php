@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Práctica 4</title>
+    <title>Práctica 6</title>
 </head>
 <body>
     <h2>Ejercicio 1</h2>
@@ -68,6 +68,19 @@
         echo "<h3>Usando ciclo DO-WHILE</h3>";
         encontrar_multiplo_dowhile($numero_dado);
     }
+    ?>
+
+    <h2>Ejercicio 4</h2>
+    <p>Crear un arreglo cuyos índices van de 97 a 122 y cuyos valores son las letras de la ‘a’
+    a la ‘z’. Usa la función chr(n) que devuelve el caracter cuyo código ASCII es n para poner
+    el valor en cada índice.</p>
+
+    <h2>Tabla de caracteres ASCII (97 - 122)</h2>
+    <?php
+    require_once __DIR__ . '/src/funciones.php';
+
+    $arreglo = generar_arreglo_ascii();
+    mostrar_tabla_ascii($arreglo);
     ?>
 </body>
 </html>

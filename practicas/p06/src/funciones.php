@@ -64,4 +64,23 @@ function encontrar_multiplo_dowhile($num) {
 
     echo "Primer múltiplo encontrado: <strong>$numero_aleatorio</strong> después de $contador intentos.<br>";
 }
+
+function generar_arreglo_ascii() {
+    $arreglo = [];
+    for ($i = 97; $i <= 122; $i++) {
+        $arreglo[$i] = chr($i);
+    }
+    return $arreglo;
+}
+
+function mostrar_tabla_ascii($arreglo) {
+    echo '<table border="1" cellpadding="5">';
+    echo '<tr><th>Índice ASCII</th><th>Letra</th></tr>';
+    
+    foreach ($arreglo as $key => $value) {
+        echo "<tr><td>$key</td><td>$value</td></tr>";
+    }
+    
+    echo '</table>';
+}
 ?>
