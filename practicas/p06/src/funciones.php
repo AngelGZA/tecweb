@@ -83,4 +83,13 @@ function mostrar_tabla_ascii($arreglo) {
     
     echo '</table>';
 }
+
+function validar_edad_sexo($edad, $sexo) {
+    if ($sexo == "femenino" && $edad >= 18 && $edad <= 35) {
+        echo "<p style='color: green;'><strong>Bienvenida</strong>, usted está en el rango de edad permitido.</p>";
+    } else {
+        echo "<p style='color: red;'><strong>Error</strong>, no cumple con los criterios.</p>";
+    }
+}
+
 ?>

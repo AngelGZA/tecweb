@@ -82,5 +82,35 @@
     $arreglo = generar_arreglo_ascii();
     mostrar_tabla_ascii($arreglo);
     ?>
+
+    <h2>Ejercicio 5</h2>
+    <p>Usar las variables $edad y $sexo en una instrucción if para identificar una persona de
+    sexo “femenino”, cuya edad oscile entre los 18 y 35 años y mostrar un mensaje de
+    bienvenida apropiado. Por ejemplo:</p>
+    <p>Bienvenida, usted está en el rango de edad permitido.</p>
+
+    <h2>Validación de Edad y Sexo</h2>
+    <form method="POST" action="">
+        <label for="edad">Ingrese su edad:</label>
+        <input type="number" name="edad" id="edad" required><br><br>
+
+        <label for="sexo">Seleccione su sexo:</label>
+        <select name="sexo" id="sexo" required>
+            <option value="femenino">Femenino</option>
+            <option value="masculino">Masculino</option>
+        </select><br><br>
+
+        <input type="submit" name="validar" value="Validar">
+    </form>
+
+    <?php
+    if (isset($_POST['validar'])) {
+        $edad = $_POST['edad'];
+        $sexo = $_POST['sexo'];
+        validar_edad_sexo($edad, $sexo);
+    }
+    ?>
+
+    
 </body>
 </html>
