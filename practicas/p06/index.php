@@ -90,7 +90,7 @@
     <p>Bienvenida, usted está en el rango de edad permitido.</p>
 
     <h2>Validación de Edad y Sexo</h2>
-    <form method="POST" action="">
+    <form method="POST" action="http://localhost/tecweb/practicas/p06/index.php">
         <label for="edad">Ingrese su edad:</label>
         <input type="number" name="edad" id="edad" required><br><br>
 
@@ -104,13 +104,60 @@
     </form>
 
     <?php
+    require_once __DIR__ . '/src/funciones.php';
     if (isset($_POST['validar'])) {
         $edad = $_POST['edad'];
         $sexo = $_POST['sexo'];
         validar_edad_sexo($edad, $sexo);
     }
     ?>
+    <h2>Ejercicio 6</h2>
+    <p>Crea en código duro un arreglo asociativo que sirva para registrar el parque vehicular de
+    una ciudad. Cada vehículo debe ser identificado por:</p>
+    <ul> 
+        <li>Matricula</li>
+        <li>Auto</li>
+        <ul>
+        <li>Marca</li>
+        <li>Modelo (año)</li>
+        <li>Tipo (sedan|hachback|camioneta)</li>
+        </ul>
+        <li>Propietario</li>
+        <ul>
+        <li>Nombre</li>
+        <li>Ciudad</li>
+        <li>Dirección</li>
+        </ul>
+    </ul>
 
-    
+    <h2>Consulta de Parque Vehicular</h2>
+
+    <form method="POST" action="http://localhost/tecweb/practicas/p06/index.php">
+        <label for="matricula">Buscar por matrícula:</label>
+        <input type="text" name="matricula" id="matricula" placeholder="Ej: ABC1234">
+        <input type="submit" name="buscar" value="Buscar">
+    </form>
+
+    <form method="POST" action="">
+        <input type="submit" name="mostrar_todos" value="Mostrar todos los autos">
+    </form>
+
+    <hr>
+
+    <?php
+    require_once __DIR__ . '/src/funciones.php';
+
+
+    $autos = obtener_autos();
+
+    if (isset($_POST['buscar'])) {
+        $matricula = strtoupper(trim($_POST['matricula']));
+        mostrar_auto_por_matricula($autos, $matricula);
+    }
+
+    if (isset($_POST['mostrar_todos'])) {
+        mostrar_todos_los_autos($autos);
+    }
+    ?>
 </body>
 </html>

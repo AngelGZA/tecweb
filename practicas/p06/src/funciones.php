@@ -92,4 +92,96 @@ function validar_edad_sexo($edad, $sexo) {
     }
 }
 
+function obtener_autos() {
+    return [
+        "ABC1234" => [
+            "Auto" => ["marca" => "HONDA", "modelo" => 2020, "tipo" => "camioneta"],
+            "Propietario" => ["nombre" => "Alfonso Esparza", "ciudad" => "Puebla, Pue.", "direccion" => "C.U., Jardines de San Manuel"]
+        ],
+        "XYZ5678" => [
+            "Auto" => ["marca" => "MAZDA", "modelo" => 2019, "tipo" => "sedan"],
+            "Propietario" => ["nombre" => "María Molina", "ciudad" => "Puebla, Pue.", "direccion" => "97 Oriente"]
+        ],
+        "LMN3456" => [
+            "Auto" => ["marca" => "TOYOTA", "modelo" => 2018, "tipo" => "hatchback"],
+            "Propietario" => ["nombre" => "Juan Pérez", "ciudad" => "Guadalajara, Jal.", "direccion" => "Av. Vallarta 500"]
+        ],
+        "QWE7890" => [
+            "Auto" => ["marca" => "FORD", "modelo" => 2022, "tipo" => "sedan"],
+            "Propietario" => ["nombre" => "Ana López", "ciudad" => "Monterrey, NL", "direccion" => "Calle Reforma 200"]
+        ],
+        "RTY1239" => [
+            "Auto" => ["marca" => "NISSAN", "modelo" => 2021, "tipo" => "camioneta"],
+            "Propietario" => ["nombre" => "Carlos Domínguez", "ciudad" => "CDMX", "direccion" => "Colonia Centro"]
+        ],
+        "UOP7654" => [
+            "Auto" => ["marca" => "CHEVROLET", "modelo" => 2017, "tipo" => "sedan"],
+            "Propietario" => ["nombre" => "Laura Torres", "ciudad" => "Querétaro, Qro.", "direccion" => "Av. Universidad 150"]
+        ],
+        "ZXC6543" => [
+            "Auto" => ["marca" => "BMW", "modelo" => 2023, "tipo" => "deportivo"],
+            "Propietario" => ["nombre" => "Fernando Díaz", "ciudad" => "Mérida, Yuc.", "direccion" => "Zona Centro"]
+        ],
+        "BNM5671" => [
+            "Auto" => ["marca" => "AUDI", "modelo" => 2020, "tipo" => "sedan"],
+            "Propietario" => ["nombre" => "Patricia Rojas", "ciudad" => "Veracruz, Ver.", "direccion" => "Malecón"]
+        ],
+        "VBN6782" => [
+            "Auto" => ["marca" => "TESLA", "modelo" => 2022, "tipo" => "eléctrico"],
+            "Propietario" => ["nombre" => "Javier Medina", "ciudad" => "León, Gto.", "direccion" => "Blvd. Aeropuerto"]
+        ],
+        "POI8765" => [
+            "Auto" => ["marca" => "VOLKSWAGEN", "modelo" => 2019, "tipo" => "hatchback"],
+            "Propietario" => ["nombre" => "Isabel Sánchez", "ciudad" => "Morelia, Mich.", "direccion" => "Centro Histórico"]
+        ],
+        "JKL4567" => [
+            "Auto" => ["marca" => "MERCEDES", "modelo" => 2021, "tipo" => "SUV"],
+            "Propietario" => ["nombre" => "Gustavo Herrera", "ciudad" => "San Luis Potosí, SLP.", "direccion" => "Col. Industrial"]
+        ],
+        "MNB6783" => [
+            "Auto" => ["marca" => "KIA", "modelo" => 2016, "tipo" => "camioneta"],
+            "Propietario" => ["nombre" => "Rocío Vargas", "ciudad" => "Toluca, Edo. Méx.", "direccion" => "Zona Centro"]
+        ],
+        "YUI2345" => [
+            "Auto" => ["marca" => "HYUNDAI", "modelo" => 2015, "tipo" => "sedan"],
+            "Propietario" => ["nombre" => "Roberto Cervantes", "ciudad" => "Aguascalientes, Ags.", "direccion" => "Fraccionamiento San Marcos"]
+        ],
+        "GHJ7896" => [
+            "Auto" => ["marca" => "PEUGEOT", "modelo" => 2018, "tipo" => "deportivo"],
+            "Propietario" => ["nombre" => "Beatriz Olivares", "ciudad" => "Culiacán, Sin.", "direccion" => "Col. Guadalupe"]
+        ],
+        "WER5674" => [
+            "Auto" => ["marca" => "RENAULT", "modelo" => 2017, "tipo" => "hatchback"],
+            "Propietario" => ["nombre" => "Manuel Ramírez", "ciudad" => "Campeche, Camp.", "direccion" => "Col. Aviación"]
+        ]
+    ];
+}
+
+function mostrar_auto_por_matricula($autos, $matricula) {
+    if (isset($autos[$matricula])) {
+        echo "<h3>Información del Auto con Matrícula: $matricula</h3>";
+        mostrar_info_auto($autos[$matricula]);
+    } else {
+        echo "<p style='color:red;'>No se encontró un auto con la matrícula $matricula.</p>";
+    }
+}
+
+function mostrar_todos_los_autos($autos) {
+    echo "<h3>Lista Completa de Autos</h3>";
+    foreach ($autos as $matricula => $datos) {
+        echo "<strong>Matrícula:</strong> $matricula <br>";
+        mostrar_info_auto($datos);
+        echo "<hr>";
+    }
+}
+
+function mostrar_info_auto($datos) {
+    echo "<strong>Marca:</strong> {$datos['Auto']['marca']}<br>";
+    echo "<strong>Modelo:</strong> {$datos['Auto']['modelo']}<br>";
+    echo "<strong>Tipo:</strong> {$datos['Auto']['tipo']}<br>";
+    echo "<strong>Propietario:</strong> {$datos['Propietario']['nombre']}<br>";
+    echo "<strong>Ciudad:</strong> {$datos['Propietario']['ciudad']}<br>";
+    echo "<strong>Dirección:</strong> {$datos['Propietario']['direccion']}<br>";
+}
+
 ?>
