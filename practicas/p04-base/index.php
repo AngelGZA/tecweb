@@ -31,14 +31,14 @@
         echo '</ul>';
     ?>
     <h2>Ejercicio 2</h2>
-    <p>Proporcionar los valores de $a, $b, $c como sigue:</br>
-    $a = “ManejadorSQL”;</br>
-    $b = 'MySQL’;</br>
-    $c = &$a;</p>
+    <p>Proporcionar los valores de $a, $b, $c como sigue:<br />
+    $a = “ManejadorSQL”;<br/>
+    $b = 'MySQL’;<br/>
+    $c = &amp;$a;</p>
     <p>a. Ahora muestra el contenido de cada variable</p>
-    <p>b. Agrega al código actual las siguientes asignaciones:</br>
-    $a = “PHP server”;</br>
-    $b = &$a;</p>
+    <p>b. Agrega al código actual las siguientes asignaciones:<br/>
+    $a = “PHP server”;<br/>
+    $b = &amp;$a;</p>
     <p>c. Vuelve a mostrar el contenido de cada uno</p>
     <p>d. Describe en y muestra en la página obtenida qué ocurrió en el segundo bloque de
     asignaciones</p>
@@ -71,12 +71,12 @@
     <p>Muestra el contenido de cada variable inmediatamente después de cada asignación,
        verificar la evolución del tipo de estas variables (imprime todos los componentes de los
        arreglo):</p>
-    <p>$a = “PHP5”;</br>
-       $z[] = &$a;</br>
-       $b = “5a version de PHP”;</br>
-       $c = $b*10;</br>
-       $a .= $b;</br>
-       $b *= $c;</br>
+    <p>$a = “PHP5”;<br />
+       $z[] = &amp;$a;<br />
+       $b = “5a version de PHP”;<br />
+       $c = $b*10;<br />
+       $a .= $b;<br />
+       $b *= $c;<br />
        $z[0] = “MySQL”;
     </p>
     <?php
@@ -143,10 +143,10 @@
     ?>
     <h2>Ejercicio 5</h2>
     <p>Dar el valor de las variables $a, $b, $c al final del siguiente script:</p>
-    <p>$a = “7 personas”;</br>
-       $b = (integer) $a;</br>
-       $a = “9E3”;</br>
-       $c = (double) $a;</br>
+    <p>$a = “7 personas”;<br />
+       $b = (integer) $a;<br />
+       $a = “9E3”;<br />
+       $c = (double) $a;<br />
     </p>
     <?php
         //AQUI VA MI CÓDIGO PHP
@@ -164,16 +164,16 @@
     ?>
     <h2>Ejercicio 6</h2>
     <p>Dar y comprobar el valor booleano de las variables $a, $b, $c, $d, $e y $f y muéstralas
-    usando la función var_dump(<datos>).</p>
+    usando la función var_dump(datos).</p>
     <p>Después investiga una función de PHP que permita transformar el valor booleano de $c y $e
     en uno que se pueda mostrar con un echo:</p>
     <p>
-    $a = “0”;</br>
-    $b = “TRUE”;</br>
-    $c = FALSE;</br>
-    $d = ($a OR $b);</br>
-    $e = ($a AND $c);</br>
-    $f = ($a XOR $b);</br>
+    $a = “0”;<br />
+    $b = “TRUE”;<br />
+    $c = FALSE;<br />
+    $d = ($a OR $b);<br />
+    $e = ($a AND $c);<br />
+    $f = ($a XOR $b);<br />
     </p>
     <?php
         //AQUI VA MI CÓDIGO PHP
@@ -222,5 +222,12 @@
         echo "<strong>Idioma del Navegador del Cliente:</strong><br>";
         echo $_SERVER['HTTP_ACCEPT_LANGUAGE'] . "<br>";
     ?>
+
+    <div>
+        <p>
+            <a href="https://validator.w3.org/markup/check?uri=referer"><img
+            src="https://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" /></a>
+        </p>
+    </div>
 </body>
 </html>
