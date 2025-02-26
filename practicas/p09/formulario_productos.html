@@ -23,6 +23,7 @@
         margin-top: 30px;
         color: #00BFFF;
         text-shadow: 2px 2px 10px #000;
+        font-size: 2.5rem;
     }
     h2 {
         text-align: center;
@@ -44,6 +45,8 @@
     fieldset {
         border: none;
         margin-bottom: 20px;
+        border-radius: 8px;
+        padding: 0 10px;
     }
 
     legend {
@@ -60,6 +63,27 @@
         color: #ADD8E6;
     }
 
+    select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 2px solid #00BFFF;
+    border-radius: 8px;
+    background-color: #1A1A1A;
+    color: #E0E0E0;
+    font-size: 1rem;
+    outline: none;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+    transition: all 0.3s;
+    appearance: none; /* Elimina el estilo predeterminado del navegador */
+}
+
+select:focus {
+    border-color: #00FFFF;
+    box-shadow: 0 0 10px #00FFFF, inset 0 0 10px rgba(0, 0, 0, 0.7);
+}
+
     input[type="text"],
     input[type="number"],
     textarea {
@@ -74,6 +98,7 @@
         font-size: 1rem;
         outline: none;
         box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+        transition: all 0.3s;
     }
 
     input[type="text"]:focus,
@@ -115,33 +140,89 @@
 <body>
     <h1>Level Up Store</h1>
     <h2>Registro de Nuevos Productos</h2>
-    <form id="formularioProductos" action="http://localhost/tecweb/practicas/p08/set_producto_v2.php" method="post">
+    <form id="formularioProductos" action="http://localhost/tecweb/practicas/p09/set_producto_v2.php" method="post">
         <fieldset>
-            <legend>Información del Producto</legend>
             <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" required>
+            <input type="text" id="nombre" name="nombre" required maxlength="100" placeholder="Máximo 100 caracteres">
 
             <label for="marca">Marca:</label>
-            <input type="text" id="marca" name="marca" required>
+            <select id="marca" name="marca" required>
+                <option value="">Seleccione una marca</option>
+                <option value="Sony">Sony</option>
+                <option value="Microsoft">Microsoft</option>
+                <option value="Nintendo">Nintendo</option>
+                <option value="Razer">Razer</option>
+                <option value="Logitech">Logitech</option>
+                <option value="Steam">Steam</option>
+            </select>
 
             <label for="modelo">Modelo:</label>
-            <input type="text" id="modelo" name="modelo" required>
+            <input type="text" id="modelo" name="modelo" required maxlength="25" placeholder="Texto alfanumérico">
 
             <label for="precio">Precio:</label>
-            <input type="number" id="precio" name="precio" step="0.01" required>
+            <input type="number" id="precio" name="precio" step="0.01" required min="100" placeholder="Mayor a 99.99">
 
             <label for="detalles">Detalles:</label>
-            <textarea id="detalles" name="detalles" rows="4" required></textarea>
+            <textarea id="detalles" name="detalles" rows="4" maxlength="250" placeholder="Opcional, máximo 250 caracteres"></textarea>
 
             <label for="unidades">Unidades:</label>
-            <input type="number" id="unidades" name="unidades" required>
+            <input type="number" id="unidades" name="unidades" required min="0" placeholder="Mayor o igual a 0">
 
             <label for="imagen">Imagen (URL):</label>
-            <input type="text" id="imagen" name="imagen" required>
+            <input type="text" id="imagen" name="imagen" placeholder="Opcional, deja vacío para usar imagen por defecto">
         </fieldset>
 
         <input type="submit" value="Registrar Producto">
         <input type="reset" value="Limpiar Formulario">
     </form>
+
+    <script>
+        function validarFormulario() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value.trim();
+            const precio = parseFloat(document.getElementById('precio').value);
+            const detalles = document.getElementById('detalles').value.trim();
+            const unidades = parseInt(document.getElementById('unidades').value);
+            const imagen = document.getElementById('imagen');
+
+            if (!nombre || nombre.length > 100) {
+                alert('El nombre es requerido y debe tener 100 caracteres o menos.');
+                return false;
+            }
+
+            if (!marca) {
+                alert('Debe seleccionar una marca.');
+                return false;
+            }
+
+            const alfanumericoRegex = /^[a-zA-Z0-9\s]+$/;
+            if (!modelo || !alfanumericoRegex.test(modelo) || modelo.length > 25) {
+                alert('El modelo es requerido, debe ser alfanumérico y tener 25 caracteres o menos.');
+                return false;
+            }
+
+            if (isNaN(precio) || precio <= 99.99) {
+                alert('El precio es requerido y debe ser mayor a 99.99.');
+                return false;
+            }
+
+            if (detalles.length > 250) {
+                alert('Los detalles pueden tener un máximo de 250 caracteres.');
+                return false;
+            }
+
+            if (isNaN(unidades) || unidades < 0) {
+                alert('Las unidades son requeridas y deben ser un número mayor o igual a 0.');
+                return false;
+            }
+
+            if (!imagen.value.trim()) {
+                imagen.value = "http://localhost/tecweb/practicas/p09/img/imagen.png";
+            }
+
+            return true;
+        }
+    </script>
 </body>
 </html>
