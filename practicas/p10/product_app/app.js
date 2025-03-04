@@ -59,6 +59,41 @@ function buscarID(e) {
     };
     client.send("id="+id);
 }
+function buscarProducto(e) {
+    e.preventDefault();
+    var searchQuery = document.getElementById('search').value;
+    var client = getXMLHttpRequest();
+    client.open('POST', './backend/read.php', true);
+    client.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    client.onreadystatechange = function () {
+        if (client.readyState == 4 && client.status == 200) {
+            console.log('[CLIENTE]\n' + client.responseText);
+            let productos = JSON.parse(client.responseText);
+            if (productos.length > 0) {
+                let template = '';
+                productos.forEach(producto => {
+                    let descripcion = '';
+                    descripcion += `<li>precio: ${producto.precio}</li>`;
+                    descripcion += `<li>unidades: ${producto.unidades}</li>`;
+                    descripcion += `<li>modelo: ${producto.modelo}</li>`;
+                    descripcion += `<li>marca: ${producto.marca}</li>`;
+                    descripcion += `<li>detalles: ${producto.detalles}</li>`;
+                    template += `
+                        <tr>
+                            <td>${producto.id}</td>
+                            <td>${producto.nombre}</td>
+                            <td><ul>${descripcion}</ul></td>
+                        </tr>
+                    `;
+                });
+                document.getElementById("productos").innerHTML = template;
+            } else {
+                document.getElementById("productos").innerHTML = "<tr><td colspan='3'>No se encontraron productos.</td></tr>";
+            }
+        }
+    };
+    client.send("search=" + encodeURIComponent(searchQuery));
+}
 
 // FUNCIÓN CALLBACK DE BOTÓN "Agregar Producto"
 function agregarProducto(e) {
