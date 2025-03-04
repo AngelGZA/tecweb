@@ -95,31 +95,78 @@ function buscarProducto(e) {
     client.send("search=" + encodeURIComponent(searchQuery));
 }
 
-// FUNCIÓN CALLBACK DE BOTÓN "Agregar Producto"
 function agregarProducto(e) {
     e.preventDefault();
 
-    // SE OBTIENE DESDE EL FORMULARIO EL JSON A ENVIAR
-    var productoJsonString = document.getElementById('description').value;
-    // SE CONVIERTE EL JSON DE STRING A OBJETO
-    var finalJSON = JSON.parse(productoJsonString);
-    // SE AGREGA AL JSON EL NOMBRE DEL PRODUCTO
-    finalJSON['nombre'] = document.getElementById('name').value;
-    // SE OBTIENE EL STRING DEL JSON FINAL
-    productoJsonString = JSON.stringify(finalJSON,null,2);
+    // Validar los datos antes de enviarlos
+    if (!validarFormulario()) {
+        return;
+    }
 
-    // SE CREA EL OBJETO DE CONEXIÓN ASÍNCRONA AL SERVIDOR
+    // Obtener los datos del formulario
+    var productoJsonString = document.getElementById('description').value;
+    var finalJSON = JSON.parse(productoJsonString);
+    finalJSON['nombre'] = document.getElementById('name').value;
+    productoJsonString = JSON.stringify(finalJSON, null, 2);
+
+    // Crear la conexión al servidor
     var client = getXMLHttpRequest();
     client.open('POST', './backend/create.php', true);
     client.setRequestHeader('Content-Type', "application/json;charset=UTF-8");
+    
     client.onreadystatechange = function () {
-        // SE VERIFICA SI LA RESPUESTA ESTÁ LISTA Y FUE SATISFACTORIA
         if (client.readyState == 4 && client.status == 200) {
-            console.log(client.responseText);
+            let response = JSON.parse(client.responseText);
+            alert(response.message);  //Muestra el mensaje en una alerta
         }
     };
+
     client.send(productoJsonString);
 }
+function validarFormulario() {
+    const nombre = document.getElementById('name')?.value.trim();
+    const descripcion = document.getElementById('description')?.value.trim();
+
+    if (!nombre) {
+        alert('El nombre del producto es requerido.');
+        return false;
+    }
+
+    if (!descripcion) {
+        alert('Debes ingresar el JSON del producto.');
+        return false;
+    }
+
+    let producto;
+    try {
+        producto = JSON.parse(descripcion);
+    } catch (error) {
+        alert('El JSON del producto es inválido.');
+        return false;
+    }
+
+    // Verifica que el JSON tenga los campos requeridos
+    if (!producto.marca || !producto.modelo || !producto.precio || !producto.unidades) {
+        alert('El JSON debe incluir marca, modelo, precio y unidades.');
+        return false;
+    }
+
+    if (typeof producto.precio !== 'number' || producto.precio <= 99.99) {
+        alert('El precio debe ser un número mayor a 99.99.');
+        return false;
+    }
+
+    if (isNaN(producto.precio) || Number(producto.precio) <= 99.99) {
+        alert('El precio debe ser un número mayor a 99.99.');
+        return false;
+    }
+
+    return true;
+}
+
+
+
+
 
 // SE CREA EL OBJETO DE CONEXIÓN COMPATIBLE CON EL NAVEGADOR
 function getXMLHttpRequest() {
