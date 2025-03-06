@@ -2,7 +2,7 @@ $(function(){
     console.log('jQuery is Working');
     init();
 });
-
+let edit = false;
 var baseJSON = {
     "precio": 0.0,
     "unidades": 1,
@@ -32,7 +32,9 @@ function listarProductos() {
             template += `
                 <tr productId="${producto.id}">
                     <td>${producto.id}</td>
-                    <td>${producto.nombre}</td>
+                    <td>
+                    <a href="#" class="product-item">${producto.nombre}</a>
+                    </td>
                     <td><ul>${descripcion}</ul></td>
                     <td>
                         <button class="product-delete btn btn-danger">Eliminar</button>
@@ -79,10 +81,14 @@ $("#product-form").submit(function(e) {
     let productoJsonString = $("#description").val();
     let finalJSON = JSON.parse(productoJsonString);
     finalJSON['nombre'] = $("#name").val();
+    finalJSON['id'] = $("#productId").val();
     productoJsonString = JSON.stringify(finalJSON, null, 2);
     
+    let url1 = edit === false ? './backend/product-add.php' : './backend/product-edit.php';
+    console.log(url1)
+
     $.ajax({
-        url: './backend/product-add.php',
+        url: url1,
         type: 'POST',
         contentType: "application/json;charset=UTF-8",
         data: productoJsonString,
@@ -97,6 +103,8 @@ $("#product-form").submit(function(e) {
             
             if (respuesta.status !== "error") {
                 listarProductos();
+                edit = false; // Reiniciar el modo edición
+                $("#product-form").trigger("reset"); // Limpiar el formulario
             }
         }
     });
@@ -116,4 +124,29 @@ $(document).on("click", ".product-delete", function() {
             listarProductos();
         });
     }
+});
+
+$(document).on("click", ".product-item", function() {
+    let element = $(this)[0].parentElement.parentElement;
+    let id = $(element).attr("productId");
+
+    $.post("./backend/product-single.php", { id }, function(response) {
+        const producto = JSON.parse(response);
+
+        // Estructurar la descripción en formato JSON
+        let descripcionJson = {
+            "precio": producto.precio,
+            "unidades": producto.unidades,
+            "modelo": producto.modelo,
+            "marca": producto.marca,
+            "detalles": producto.detalles,
+            "imagen": producto.imagen
+        };
+
+        $("#name").val(producto.nombre);
+        $("#description").val(JSON.stringify(descripcionJson, null, 2)); // Formateado bonito
+        $("#productId").val(producto.id);
+        edit = true;
+
+    });
 });
