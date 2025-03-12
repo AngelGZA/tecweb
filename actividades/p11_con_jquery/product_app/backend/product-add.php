@@ -2,14 +2,13 @@
     include_once __DIR__.'/database.php';
 
     // SE OBTIENE LA INFORMACIÓN DEL PRODUCTO ENVIADA POR EL CLIENTE
-    $producto = file_get_contents('php://input');
     $data = array(
         'status'  => 'error',
         'message' => 'Ya existe un producto con ese nombre'
     );
-    if(!empty($producto)) {
-        // SE TRANSFORMA EL STRING DEL JASON A OBJETO
-        $jsonOBJ = json_decode($producto);
+    if(isset($_POST['nombre'])) {
+        // SE TRANSFORMA EL POST A UN STRING EN JSON, Y LUEGO A OBJETO
+        $jsonOBJ = json_decode( json_encode($_POST) );
         // SE ASUME QUE LOS DATOS YA FUERON VALIDADOS ANTES DE ENVIARSE
         $sql = "SELECT * FROM productos WHERE nombre = '{$jsonOBJ->nombre}' AND eliminado = 0";
 	    $result = $conexion->query($sql);
