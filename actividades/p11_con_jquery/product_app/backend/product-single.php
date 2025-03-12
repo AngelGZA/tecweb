@@ -1,29 +1,29 @@
 <?php
     include_once __DIR__.'/database.php';
 
-    // SE CREA EL ARREGLO QUE SE VA A DEVOLVER EN FORMA DE JSON
-    $data = array();
-
-    if( isset($_POST['id']) ) {
+    if (isset($_POST['id'])) {
         $id = $_POST['id'];
-        // SE REALIZA LA QUERY DE BÚSQUEDA Y AL MISMO TIEMPO SE VALIDA SI HUBO RESULTADOS
-        if ( $result = $conexion->query("SELECT * FROM productos WHERE id = {$id}") ) {
-            // SE OBTIENEN LOS RESULTADOS
-            $row = $result->fetch_assoc();
+        $conexion->set_charset("utf8");
 
-            if(!is_null($row)) {
-                // SE CODIFICAN A UTF-8 LOS DATOS Y SE MAPEAN AL ARREGLO DE RESPUESTA
-                foreach($row as $key => $value) {
-                    $data[$key] = utf8_encode($value);
-                }
-            }
-            $result->free();
+        $sql = "SELECT * FROM productos WHERE id = $id";
+        $result = $conexion->query($sql);
+
+        if ($result->num_rows > 0) {
+            $producto = $result->fetch_assoc();
+            // Estructurar el JSON correctamente
+            $json_producto = array(
+                "id"       => $producto['id'],
+                "nombre"   => $producto['nombre'],
+                "precio"   => (float) $producto['precio'],
+                "unidades" => (int) $producto['unidades'],
+                "modelo"   => $producto['modelo'],
+                "marca"    => $producto['marca'],
+                "detalles" => $producto['detalles'],
+                "imagen"   => $producto['imagen']
+            );
+            echo json_encode($json_producto, JSON_PRETTY_PRINT);
         } else {
-            die('Query Error: '.mysqli_error($conexion));
+            echo json_encode(["error" => "Producto no encontrado"]);
         }
-        $conexion->close();
     }
-
-    // SE HACE LA CONVERSIÓN DE ARRAY A JSON
-    echo json_encode($data, JSON_PRETTY_PRINT);
 ?>

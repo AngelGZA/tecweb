@@ -94,6 +94,7 @@ $(document).ready(function () {
     // Validaciones individuales
     function validarNombre() {
         let nombre = $("#nombre").val().trim();
+        let nombreOriginal = $("#nombre").data("original"); // Obtener nombre original
         let estadoNombre = $(".estado-nombre");
     
         if (nombre === "" || nombre.length > 100) {
@@ -102,13 +103,20 @@ $(document).ready(function () {
             return false;
         }
     
-        // Validar si el nombre ya existe
+        // ⚡ Si está en modo edición y el nombre no cambió, permitirlo
+        if (edit && nombre === nombreOriginal) {
+            limpiarError("#nombre");
+            estadoNombre.text("✅ El nombre no ha cambiado.").css("color", "green");
+            return true;
+        }
+    
+        // ⚠️ Validar si el nombre existe en la base de datos
         let nombreExiste = false;
         $.ajax({
             url: './backend/product-validate-name.php',
             type: 'GET',
             data: { nombre: nombre },
-            async: false, // Hacer la solicitud síncrona para esperar la respuesta
+            async: false,
             success: function (response) {
                 let data = JSON.parse(response);
                 if (data.status === 'error') {
@@ -123,13 +131,15 @@ $(document).ready(function () {
             }
         });
     
-        if (nombreExiste) {
+        // ❌ Si el nombre ya existe y no estamos en edición, bloquearlo
+        if (!edit && nombreExiste) {
             return false;
         }
     
         limpiarError("#nombre");
         return true;
     }
+    
 
     function validarModelo() {
         let modelo = $("#modelo").val().trim();
@@ -203,15 +213,7 @@ $(document).ready(function () {
             return true;
         }
     
-        // Validar que la URL de la imagen sea válida
-        if (!/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-])\/?$/.test(imagen)) {
-            mostrarError("#imagen", "La URL de la imagen no es válida.");
-            estadoImagen.text("❌ La URL de la imagen es inválida.").css("color", "red");
-            return false;
-        }
-    
         limpiarError("#imagen");
-        estadoImagen.text("✅ La URL de la imagen es válida.").css("color", "green");
         return true;
     }
 
@@ -238,6 +240,14 @@ $(document).ready(function () {
     // Enviar formulario
     $('#product-form').submit(e => {
         e.preventDefault();
+
+        let idProducto = $('#productId').val();
+        console.log("ID del producto:", idProducto); // Verifica si se está enviando el ID
+
+        if (edit === true && (idProducto === "" || idProducto === undefined)) {
+            alert("Error: No se encontró el ID del producto.");
+            return;
+        }
         if (!validarFormulario()) {
             alert("Por favor, corrige los errores antes de agregar el producto.");
             return;
@@ -252,23 +262,40 @@ $(document).ready(function () {
             detalles: $('#detalles').val(),
             unidades: $('#unidades').val(),
             imagen: $('#imagen').val(),
-            id: $('#productId').val() || null // Si está en modo edición, incluye el ID
+            id: $('#productId').val() // Asegúrate de que el ID se esté enviando
         };
+    
+        console.log("Datos enviados:", postData); // Imprime los datos en la consola
     
         const url = edit === false ? './backend/product-add.php' : './backend/product-edit.php';
     
         $.post(url, postData, (response) => {
-            let respuesta = JSON.parse(response);
-            let template_bar = `
-                <li style="list-style: none;">status: ${respuesta.status}</li>
-                <li style="list-style: none;">message: ${respuesta.message}</li>
-            `;
-            $('#product-result').show();
-            $('#container').html(template_bar);
-            listarProductos();
-            edit = false;
-            $('button.btn-primary').text("Agregar Producto");
-            $('#product-form')[0].reset(); // Reinicia el formulario
+            console.log("Respuesta del servidor:", response); // Imprime la respuesta en la consola
+            try {
+                let respuesta = JSON.parse(response);
+                if (respuesta.status === "success") {
+                    // Mostrar mensaje de éxito
+                    let template_bar = `
+                        <li style="list-style: none;">status: ${respuesta.status}</li>
+                        <li style="list-style: none;">message: ${respuesta.message}</li>
+                    `;
+                    $('#product-result').show();
+                    $('#container').html(template_bar);
+    
+                    // Volver a cargar la lista de productos
+                    listarProductos();
+    
+                    // Reiniciar el formulario
+                    edit = false;
+                    $('button.btn-primary').text("Agregar Producto");
+                    $('#product-form')[0].reset();
+                } else {
+                    alert(respuesta.message); // Mostrar mensaje de error
+                }
+            } catch (error) {
+                console.error("Error al parsear la respuesta:", error);
+                console.error("Respuesta del servidor:", response);
+            }
         });
     });
 
@@ -290,14 +317,14 @@ $(document).ready(function () {
         const id = $(element).attr('productId'); // Obtiene el ID del producto
         $.post('./backend/product-single.php', { id }, (response) => {
             let product = JSON.parse(response);
-            $('#nombre').val(product.nombre);
+            $('#nombre').val(product.nombre).data("original", product.nombre); // Guardar nombre original
             $('#marca').val(product.marca);
             $('#modelo').val(product.modelo);
             $('#precio').val(product.precio);
             $('#detalles').val(product.detalles);
             $('#unidades').val(product.unidades);
             $('#imagen').val(product.imagen);
-            $('#productId').val(product.id); // Campo oculto para el ID
+            $('#productId').val(product.id); // Llenar el campo oculto con el ID
             edit = true; // Activa el modo edición
             $('button.btn-primary').text("Modificar Producto"); // Cambia el texto del botón
         });

@@ -6,7 +6,7 @@
     <!-- BOOTSTRAP 4  -->
     <link rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.min.css">
   </head>
-  <body onload="init()">
+  <body>
 
     <!-- BARRA DE NAVEGACIÓN  -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -31,16 +31,61 @@
             <div class="card-body">
               <!-- FORMULARIO PARA AGREGAR PRODUCTO -->
               <form id="product-form">
-                <div class="form-group">
-                  <input class="form-control" type="text" id="name" placeholder="Nombre de producto">
-                </div>
-                <div class="form-group">
-                  <textarea class="form-control" id="description" cols="30" rows="10" placeholder="JSON de producto"></textarea>
-                </div>
-                <input type="hidden" id="productId">
-                <button class="btn btn-primary btn-block text-center" type="submit">
-                  Agregar Producto
-                </button>
+                <fieldset>
+                  <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" required maxlength="100" placeholder="Máximo 100 caracteres">
+                    <small class="form-text text-muted estado-nombre"></small> <!-- Barra de estado -->
+                  </div>
+              
+                  <div class="form-group">
+                    <label for="marca">Marca:</label>
+                    <select id="marca" name="marca" class="form-control" required>
+                      <option value="">Seleccione una marca</option>
+                      <option value="Sony">Sony</option>
+                      <option value="Microsoft">Microsoft</option>
+                      <option value="Nintendo">Nintendo</option>
+                      <option value="Razer">Razer</option>
+                      <option value="Logitech">Logitech</option>
+                      <option value="Steam">Steam</option>
+                      <option value="PS5">PS5</option>
+                      
+                    </select>
+                    <small class="form-text text-muted estado-marca"></small> <!-- Barra de estado -->
+                  </div>
+              
+                  <div class="form-group">
+                    <label for="modelo">Modelo:</label>
+                    <input type="text" id="modelo" name="modelo" class="form-control" required maxlength="25" placeholder="Texto alfanumérico">
+                    <small class="form-text text-muted estado-modelo"></small> <!-- Barra de estado -->
+                  </div>
+              
+                  <div class="form-group">
+                    <label for="precio">Precio:</label>
+                    <input type="number" id="precio" name="precio" class="form-control" step="0.01" required min="100" placeholder="Mayor a 99.99">
+                    <small class="form-text text-muted estado-precio"></small> <!-- Barra de estado -->
+                  </div>
+              
+                  <div class="form-group">
+                    <label for="detalles">Detalles:</label>
+                    <textarea id="detalles" name="detalles" class="form-control" rows="4" maxlength="250" placeholder="Opcional, máximo 250 caracteres"></textarea>
+                    <small class="form-text text-muted estado-detalles"></small> <!-- Barra de estado -->
+                  </div>
+              
+                  <div class="form-group">
+                    <label for="unidades">Unidades:</label>
+                    <input type="number" id="unidades" name="unidades" class="form-control" required min="0" placeholder="Mayor o igual a 0">
+                    <small class="form-text text-muted estado-unidades"></small> <!-- Barra de estado -->
+                  </div>
+              
+                  <div class="form-group">
+                    <label for="imagen">Imagen (URL):</label>
+                    <input type="text" id="imagen" name="imagen" class="form-control" placeholder="Opcional, deja vacío para usar imagen por defecto">
+                    <small class="form-text text-muted estado-imagen"></small> <!-- Barra de estado -->
+                  </div>
+                </fieldset>
+                <input type="hidden" id="productId" name="id"> <!-- Campo oculto para el ID -->
+                <button class="btn btn-primary btn-block" type="submit">Agregar Producto</button>
               </form>
             </div>
           </div>
