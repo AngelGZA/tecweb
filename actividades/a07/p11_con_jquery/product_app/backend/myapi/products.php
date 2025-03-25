@@ -7,11 +7,13 @@
     class Products extends DataBase{
         private $data = NULL; 
 
+
         public function __construct($db, $user='root', $pass='Mitelefono12'){
             $this->data = array(); 
             parent::__construct($user, $pass, $db); 
         }
 
+        
         public function add ($prod){
             $this->data= $prod; 
         
