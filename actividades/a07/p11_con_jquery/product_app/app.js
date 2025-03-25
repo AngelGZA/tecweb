@@ -299,6 +299,70 @@ $(document).ready(function () {
         });
     });
 
+    $('#search-form').submit(function (e) {
+    e.preventDefault();
+    console.log("Búsqueda iniciada"); // Verifica que el evento se esté ejecutando
+    let search = $('#search').val();
+    console.log("Término de búsqueda:", search); // Verifica el término de búsqueda
+
+    if (search) {
+        $.ajax({
+            url: './backend/product-search.php',
+            type: 'GET',
+            data: { search: search },
+            success: function (response) {
+                console.log("Respuesta del servidor:", response); // Verifica la respuesta del servidor
+                if (!response.error) {
+                    const productos = JSON.parse(response);
+                    console.log("Productos encontrados:", productos); // Verifica los productos encontrados
+                    if (Object.keys(productos).length > 0) {
+                        let template = '';
+                        let template_bar = '';
+
+                        productos.forEach(producto => {
+                            let descripcion = `
+                                <li>precio: ${producto.precio}</li>
+                                <li>unidades: ${producto.unidades}</li>
+                                <li>modelo: ${producto.modelo}</li>
+                                <li>marca: ${producto.marca}</li>
+                                <li>detalles: ${producto.detalles}</li>
+                            `;
+                            template += `
+                                <tr productId="${producto.id}">
+                                    <td>${producto.id}</td>
+                                    <td><a href="#" class="product-item">${producto.nombre}</a></td>
+                                    <td><ul>${descripcion}</ul></td>
+                                    <td>
+                                        <button class="product-delete btn btn-danger">
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+
+                            template_bar += `<li>${producto.nombre}</li>`;
+                        });
+
+                        // Mostrar resultados
+                        $('#product-result').show();
+                        $('#container').html(template_bar);
+                        $('#products').html(template);
+                    } else {
+                        $('#products').html('<tr><td colspan="4">No se encontraron productos.</td></tr>');
+                        $('#product-result').hide();
+                    }
+                }
+            },
+            error: function () {
+                console.log("Error en la búsqueda.");
+            }
+        });
+    } else {
+        $('#product-result').hide();
+        listarProductos(); // Mostrar todos los productos si el campo de búsqueda está vacío
+    }
+});
+
     // Eliminar producto
     $(document).on('click', '.product-delete', (e) => {
         if (confirm('¿Realmente deseas eliminar el producto?')) {
