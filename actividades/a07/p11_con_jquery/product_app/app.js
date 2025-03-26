@@ -14,41 +14,60 @@ $(document).ready(function () {
             type: 'GET',
             dataType: 'json',
             success: function(response) {
-                if (response && response.length > 0) {
-                    let template = '';
-                    response.forEach(producto => {
-                        let descripcion = `
-                            <li>precio: ${producto.precio}</li>
-                            <li>unidades: ${producto.unidades}</li>
-                            <li>modelo: ${producto.modelo}</li>
-                            <li>marca: ${producto.marca}</li>
-                            <li>detalles: ${producto.detalles}</li>
-                        `;
-                        template += `
-                            <tr productId="${producto.id}">
-                                <td>${producto.id}</td>
-                                <td><a href="#" class="product-item">${producto.nombre}</a></td>
-                                <td><ul>${descripcion}</ul></td>
-                                <td>
-                                    <button class="product-delete btn btn-danger">
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    $('#products').html(template);
+                console.log("Respuesta completa:", response); // Para depuración
+                
+                // Verificar si la respuesta tiene la estructura esperada
+                if (response && response.status === 'success' && response.data) {
+                    // Verificar si data es un array
+                    if (Array.isArray(response.data)) {
+                        renderProductos(response.data);
+                    } else {
+                        console.error("Formato de data inesperado:", response.data);
+                        $('#products').html('<tr><td colspan="4">Error en el formato de datos</td></tr>');
+                    }
                 } else {
-                    $('#products').html('<tr><td colspan="4">No hay productos disponibles</td></tr>');
+                    console.error("Respuesta inesperada o error:", response);
+                    $('#products').html('<tr><td colspan="4">Error al cargar los productos</td></tr>');
                 }
             },
             error: function(xhr) {
-                console.error("Error al cargar productos:", xhr.responseText);
+                console.error("Error en la solicitud:", xhr.responseText);
                 $('#products').html('<tr><td colspan="4">Error al cargar los productos</td></tr>');
             }
         });
     }
-
+    
+    // Función auxiliar para renderizar productos
+    function renderProductos(productos) {
+        if (productos.length > 0) {
+            let template = '';
+            productos.forEach(producto => {
+                let descripcion = `
+                    <li>precio: ${producto.precio}</li>
+                    <li>unidades: ${producto.unidades}</li>
+                    <li>modelo: ${producto.modelo}</li>
+                    <li>marca: ${producto.marca}</li>
+                    <li>detalles: ${producto.detalles}</li>
+                `;
+                template += `
+                    <tr productId="${producto.id}">
+                        <td>${producto.id}</td>
+                        <td><a href="#" class="product-item">${producto.nombre}</a></td>
+                        <td><ul>${descripcion}</ul></td>
+                        <td>
+                            <button class="product-delete btn btn-danger">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            $('#products').html(template);
+        } else {
+            $('#products').html('<tr><td colspan="4">No hay productos disponibles</td></tr>');
+        }
+    }
+    
     // Función para mostrar errores
     function mostrarError(input, mensaje) {
         let errorSpan = $(input).next(".error-text");
@@ -97,53 +116,80 @@ $(document).ready(function () {
         }
     });
 
-    // Validaciones individuales
-    function validarNombre() {
-        let nombre = $("#nombre").val().trim();
-        let nombreOriginal = $("#nombre").data("original"); // Obtener nombre original
-        let estadoNombre = $(".estado-nombre");
+    function validarNombreExistente(nombre, currentId = null) {
+        return new Promise((resolve) => {
+            const estadoNombre = $(".estado-nombre");
+            
+            // Validación básica antes de hacer la petición
+            if (!nombre || nombre.length > 100) {
+                estadoNombre.text("❌ Nombre inválido").css("color", "red");
+                resolve(false);
+                return;
+            }
     
-        if (nombre === "" || nombre.length > 100) {
-            mostrarError("#nombre", "El nombre es obligatorio y debe tener máximo 100 caracteres.");
-            estadoNombre.text("❌ El nombre es inválido.").css("color", "red");
+            $.ajax({
+                url: './backend/product-validate-name.php',
+                type: 'GET',
+                data: { 
+                    nombre: nombre,
+                    excludeId: currentId
+                },
+                success: function(response) {
+                    try {
+                        const data = typeof response === 'string' ? JSON.parse(response) : response;
+                        
+                        if (data.status === "success") {
+                            estadoNombre.text("✅ " + data.message).css("color", "green");
+                            resolve(true);
+                        } else {
+                            estadoNombre.text("❌ " + data.message).css("color", "red");
+                            resolve(false);
+                        }
+                    } catch (e) {
+                        console.error("Error parsing validation response:", e);
+                        estadoNombre.text("⚠️ Error en validación").css("color", "orange");
+                        resolve(true); // Permitir continuar si falla la validación
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Error en validación:", xhr.statusText);
+                    estadoNombre.text("⚠️ Servicio no disponible").css("color", "orange");
+                    resolve(true); // Permitir continuar si falla la validación
+                }
+            });
+        });
+    }
+    
+    // Función de validación de nombre actualizada
+    async function validarNombre() {
+        const nombre = $("#nombre").val().trim();
+        const nombreOriginal = $("#nombre").data("original");
+        const estadoNombre = $(".estado-nombre");
+        const currentId = $('#productId').val() || null;
+    
+        // Validación básica
+        if (!nombre || nombre.length > 100) {
+            mostrarError("#nombre", "Nombre inválido (1-100 caracteres)");
+            estadoNombre.text("❌ Nombre inválido").css("color", "red");
             return false;
         }
     
-        // ⚡ Si está en modo edición y el nombre no cambió, permitirlo
+        // Si estamos editando y el nombre no cambió
         if (edit && nombre === nombreOriginal) {
             limpiarError("#nombre");
-            estadoNombre.text("✅ El nombre no ha cambiado.").css("color", "green");
+            estadoNombre.text("✅ Nombre válido").css("color", "green");
             return true;
         }
     
-        // ⚠️ Validar si el nombre existe en la base de datos
-        let nombreExiste = false;
-        $.ajax({
-            url: './backend/product-validate-name.php',
-            type: 'GET',
-            data: { nombre: nombre },
-            async: false,
-            success: function (response) {
-                let data = JSON.parse(response);
-                if (data.status === 'error') {
-                    nombreExiste = true;
-                    estadoNombre.text("❌ " + data.message).css("color", "red");
-                } else {
-                    estadoNombre.text("✅ " + data.message).css("color", "green");
-                }
-            },
-            error: function () {
-                console.log("Error en la validación del nombre.");
-            }
-        });
-    
-        // ❌ Si el nombre ya existe y no estamos en edición, bloquearlo
-        if (!edit && nombreExiste) {
-            return false;
+        // Validar existencia del nombre (solo si es necesario)
+        const valido = await validarNombreExistente(nombre, currentId);
+        if (!valido) {
+            mostrarError("#nombre", "El nombre ya existe");
+        } else {
+            limpiarError("#nombre");
         }
-    
-        limpiarError("#nombre");
-        return true;
+        
+        return valido;
     }
     
 
@@ -450,23 +496,66 @@ $(document).ready(function () {
     });
 
     // Editar producto
-    $(document).on('click', '.product-item', (e) => {
-        const element = $(e.target).closest('tr'); // Obtiene la fila del producto
-        const id = $(element).attr('productId'); // Obtiene el ID del producto
-        $.post('./backend/product-single.php', { id }, (response) => {
-            let product = JSON.parse(response);
-            $('#nombre').val(product.nombre).data("original", product.nombre); // Guardar nombre original
-            $('#marca').val(product.marca);
-            $('#modelo').val(product.modelo);
-            $('#precio').val(product.precio);
-            $('#detalles').val(product.detalles);
-            $('#unidades').val(product.unidades);
-            $('#imagen').val(product.imagen);
-            $('#productId').val(product.id); // Llenar el campo oculto con el ID
-            edit = true; // Activa el modo edición
-            $('button.btn-primary').text("Modificar Producto"); // Cambia el texto del botón
+    $(document).on('click', '.product-item', function(e) {
+    e.preventDefault();
+    
+    const element = $(this).closest('tr');
+    const id = element.attr('productId');
+    
+    // Mostrar carga mientras se obtiene el producto
+    Swal.fire({
+        title: 'Cargando producto...',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+            
+            $.ajax({
+                url: './backend/product-single.php',
+                type: 'POST', // Puedes usar POST o GET
+                data: { id: id },
+                dataType: 'json',
+                success: function(response) {
+                    Swal.close();
+                    
+                    if(response.status === 'success' && response.data) {
+                        const product = response.data;
+                        
+                        // Rellenar formulario
+                        $('#nombre').val(product.nombre).data("original", product.nombre);
+                        $('#marca').val(product.marca);
+                        $('#modelo').val(product.modelo);
+                        $('#precio').val(parseFloat(product.precio).toFixed(2));
+                        $('#detalles').val(product.detalles);
+                        $('#unidades').val(product.unidades);
+                        $('#imagen').val(product.imagen);
+                        $('#productId').val(product.id);
+                        
+                        // Cambiar a modo edición
+                        edit = true;
+                        $('button.btn-primary').text("Modificar Producto");
+                        
+                        // Resetear validación
+                        limpiarError("#nombre");
+                        $(".estado-nombre").text("✅ Modo edición").css("color", "green");
+                    } else {
+                        Swal.fire(
+                            'Error',
+                            response.message || 'No se pudo cargar el producto',
+                            'error'
+                        );
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire(
+                        'Error',
+                        'No se pudo cargar el producto',
+                        'error'
+                    );
+                    console.error("Error al cargar producto:", xhr.responseText);
+                    }
+                });
+            }
         });
-        e.preventDefault();
     });
 
     function showNotification(message, type = 'success') {

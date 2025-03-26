@@ -150,27 +150,28 @@
         }
 
         public function list(){
-            //CREAMOS EL ARREGLO A DEVOLVERSE EN FORMA JSON
-            $this->data=array(); 
-
-            //Query de búsqueda y validación de resultados 
+            $this->data = [
+                'status' => 'error',
+                'message' => 'Error al listar productos',
+                'data' => []
+            ];
+        
             if($result = $this->conexion->query("SELECT * FROM productos WHERE eliminado = 0")){
-
-                //obtenemos resultados
-                $rows = $result->fetch_all(MYSQLI_ASSOC); 
-                if(!is_null($rows)){
-                    //codificación a UTF-8 de datos y mapeo al arreglo de respuesta
-                    foreach($rows as $num => $row){
-                        foreach($row as $key => $value){
-                            $this ->data[$num][$key]=$value; 
-                        }
-                    }
+                $rows = $result->fetch_all(MYSQLI_ASSOC);
+                
+                if(!empty($rows)) {
+                    $this->data = [
+                        'status' => 'success',
+                        'message' => 'Productos obtenidos correctamente',
+                        'data' => $rows
+                    ];
+                } else {
+                    $this->data['message'] = 'No hay productos disponibles';
                 }
-                $result->free(); 
-            } else{
-                die('Query Error: '.mysqli_error($this->conexion)); 
+                $result->free();
+            } else {
+                $this->data['message'] = 'Query Error: '.mysqli_error($this->conexion);
             }
-            //$this->conexion->close(); 
         }
 
         public function search($search){
@@ -202,27 +203,30 @@
         }
 
         public function single($id){
-            $this->data = array();
-
-            if( isset($_POST['id']) ) {
-                $id = $_POST['id'];
-                // SE REALIZA LA QUERY DE BÚSQUEDA Y AL MISMO TIEMPO SE VALIDA SI HUBO RESULTADOS
-                if ( $result = $this->conexion->query("SELECT * FROM productos WHERE id = {$id}") ) {
-                    // SE OBTIENEN LOS RESULTADOS
-                    $row = $result->fetch_assoc();
+            $this->data = [
+                'status' => 'error',
+                'message' => 'Producto no encontrado'
+            ];
         
+            if(!empty($id)) {
+                $id = $this->conexion->real_escape_string($id);
+                $sql = "SELECT * FROM productos WHERE id = {$id} AND eliminado = 0";
+                
+                if ($result = $this->conexion->query($sql)) {
+                    $row = $result->fetch_assoc();
+                    
                     if(!is_null($row)) {
-                        // SE CODIFICAN A UTF-8 LOS DATOS Y SE MAPEAN AL ARREGLO DE RESPUESTA
-                        foreach($row as $key => $value) {
-                            $this->data[$key] = utf8_encode($value);
-                        }
+                        $this->data = [
+                            'status' => 'success',
+                            'data' => $row
+                        ];
                     }
                     $result->free();
                 } else {
-                    die('Query Error: '.mysqli_error($this->conexion));
+                    $this->data['message'] = 'Error en la consulta: ' . $this->conexion->error;
                 }
-                $this->conexion->close();
             }
+            // No cerrar la conexión aquí, déjala abierta para que getData() funcione
         }
 
         public function singleByName($name){
@@ -243,8 +247,11 @@
         }
 
         public function getData(){
-            header('Content-Type: application/json');
-            return json_encode($this->data, JSON_PRETTY_PRINT); 
+            // Cerrar la conexión aquí, después de que todos los datos estén listos
+            if(isset($this->conexion)) {
+                $this->conexion->close();
+            }
+            return json_encode($this->data, JSON_PRETTY_PRINT);
         }
     }
 ?>
