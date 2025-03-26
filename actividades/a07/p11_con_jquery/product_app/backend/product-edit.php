@@ -1,68 +1,29 @@
 <?php
-include_once __DIR__.'/database.php';
+use TECWEB\MYAPI\Products as Products; 
+require_once __DIR__.'/myapi/Products.php';
 
-// SE OBTIENE LA INFORMACIÓN DEL PRODUCTO ENVIADA POR EL CLIENTE
-$data = array(
-    'status'  => 'error',
-    'message' => 'No se pudo actualizar el producto'
-);
+header('Content-Type: application/json');
 
-if (isset($_POST['id'])) {
-    // SE TRANSFORMA EL POST A UN OBJETO
-    $jsonOBJ = (object)$_POST;
+$prodObj = new Products('marketzone');
 
-    // VALIDACIÓN DEL PRECIO
-    if ($jsonOBJ->precio < 99) {
-        $data['message'] = "Error: El precio no puede ser menor a 99.";
-        echo json_encode($data, JSON_PRETTY_PRINT);
-        exit;
+try {
+    $postData = $_POST;
+    
+    if (!isset($postData['id'])) {
+        throw new Exception('ID de producto no proporcionado');
     }
-
-    // VALIDACIÓN DE LAS UNIDADES
-    if ($jsonOBJ->unidades < 0) {
-        $data['message'] = "Error: Las unidades no pueden ser menor a 0.";
-        echo json_encode($data, JSON_PRETTY_PRINT);
-        exit;
-    }
-
-    // VALIDACIÓN DEL MODELO
-    if (!preg_match('/^[a-zA-Z0-9\-]+$/', $jsonOBJ->modelo)) {
-        $data['message'] = "Error: El modelo debe ser alfanumérico.";
-        echo json_encode($data, JSON_PRETTY_PRINT);
-        exit;
-    }
-
-    // ESCAPAR LOS VALORES PARA EVITAR INYECCIÓN SQL
-    $nombre = $conexion->real_escape_string($jsonOBJ->nombre);
-    $marca = $conexion->real_escape_string($jsonOBJ->marca);
-    $modelo = $conexion->real_escape_string($jsonOBJ->modelo);
-    $precio = floatval($jsonOBJ->precio);
-    $detalles = $conexion->real_escape_string($jsonOBJ->detalles);
-    $unidades = intval($jsonOBJ->unidades);
-    $imagen = $conexion->real_escape_string($jsonOBJ->imagen);
-    $id = intval($jsonOBJ->id);
-
-    // SE ASUME QUE LOS DATOS YA FUERON VALIDADOS ANTES DE ENVIARSE
-    $sql = "UPDATE productos SET 
-            nombre = '$nombre', 
-            marca = '$marca', 
-            modelo = '$modelo', 
-            precio = $precio, 
-            detalles = '$detalles', 
-            unidades = $unidades, 
-            imagen = '$imagen' 
-            WHERE id = $id";
-
-    if ($conexion->query($sql)) {
-        $data['status'] = "success";
-        $data['message'] = "Producto actualizado";
-    } else {
-        $data['message'] = "ERROR: No se ejecutó $sql. " . mysqli_error($conexion);
-    }
-
-    $conexion->close();
+    
+    // Procesar la edición y obtener respuesta
+    $prodObj->edit($postData);
+    
+    // El método edit ahora maneja su propia salida JSON
+    exit;
+    
+} catch (Exception $e) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => $e->getMessage()
+    ]);
+    exit;
 }
-
-// SE HACE LA CONVERSIÓN DE ARRAY A JSON
-echo json_encode($data, JSON_PRETTY_PRINT);
 ?>

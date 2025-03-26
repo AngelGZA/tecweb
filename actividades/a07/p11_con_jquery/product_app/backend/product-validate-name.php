@@ -1,33 +1,30 @@
 <?php
-include_once __DIR__.'/database.php';
+use TECWEB\MYAPI\Products as Products; 
+require_once __DIR__.'/myapi/Products.php';
 
-// Respuesta por defecto
-$data = array(
-    'status'  => 'error',
-    'message' => 'El nombre ya existe en la base de datos.'
-);
+header('Content-Type: application/json');
 
-// Verificar si se recibió el nombre
+$prodObj = new Products('marketzone');
+
+$response = [
+    'status' => 'error',
+    'message' => 'Nombre no proporcionado'
+];
+
 if (isset($_GET['nombre'])) {
     $nombre = $_GET['nombre'];
-
-    // Escapar caracteres especiales para evitar inyección SQL
-    $nombre = $conexion->real_escape_string($nombre);
-
-    // Consulta para verificar si el nombre ya existe
-    $sql = "SELECT * FROM productos WHERE nombre = '{$nombre}' AND eliminado = 0";
-    $result = $conexion->query($sql);
-
-    // Si no hay resultados, el nombre no existe
-    if ($result->num_rows == 0) {
-        $data['status'] = 'success';
-        $data['message'] = 'El nombre está disponible.';
+    $prodObj->singleByName($nombre);
+    $data = json_decode($prodObj->getData(), true);
+    
+    if (empty($data)) {
+        $response = [
+            'status' => 'success',
+            'message' => 'Nombre disponible'
+        ];
+    } else {
+        $response['message'] = 'Ya existe un producto con este nombre';
     }
 }
 
-// Cerrar la conexión
-$conexion->close();
-
-// Enviar la respuesta en formato JSON
-echo json_encode($data, JSON_PRETTY_PRINT);
+echo json_encode($response);
 ?>

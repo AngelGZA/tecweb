@@ -5,6 +5,38 @@
     <title>ProductApp</title>
     <!-- BOOTSTRAP 4  -->
     <link rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.min.css">
+    <style>
+      /* Estilos para las notificaciones */
+      .notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          padding: 15px 25px;
+          border-radius: 5px;
+          color: white;
+          z-index: 1000;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          animation: slideIn 0.5s, fadeOut 0.5s 2.5s forwards;
+      }
+      
+      .success {
+          background-color: #28a745;
+      }
+      
+      .error {
+          background-color: #dc3545;
+      }
+      
+      @keyframes slideIn {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+      }
+      
+      @keyframes fadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+      }
+  </style>
   </head>
   <body>
 
@@ -119,6 +151,7 @@
       crossorigin="anonymous"></script>
     <!-- Lógica del Frontend -->
     <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </body>
 
 </html>
