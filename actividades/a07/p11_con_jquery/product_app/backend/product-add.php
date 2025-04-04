@@ -2,19 +2,25 @@
 use TECWEB\MYAPI\Products as Products; 
 require_once __DIR__.'/myapi/Products.php';
 
+header('Content-Type: application/json');
+
 $prodObj = new Products('marketzone');
 
-// Obtener los datos del POST
-$postData = $_POST;
+try {
+    // Obtener los datos del POST
+    $postData = $_POST;
 
-// Verificar si hay datos
-if (!empty($postData)) {
+    // Verificar si hay datos
+    if (empty($postData)) {
+        throw new Exception('No se recibieron datos del producto');
+    }
+
     $prodObj->add($postData);
-    echo json_encode($prodObj->getData());
-} else {
+    echo $prodObj->getData();
+} catch (Exception $e) {
     echo json_encode([
         'status' => 'error',
-        'message' => 'No se recibieron datos del producto'
+        'message' => $e->getMessage()
     ]);
 }
 ?>

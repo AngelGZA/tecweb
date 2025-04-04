@@ -13,11 +13,8 @@ try {
         throw new Exception('ID de producto no proporcionado');
     }
     
-    // Procesar la edición y obtener respuesta
     $prodObj->edit($postData);
-    
-    // El método edit ahora maneja su propia salida JSON
-    exit;
+    echo $prodObj->getData();
     
 } catch (Exception $e) {
     echo json_encode([

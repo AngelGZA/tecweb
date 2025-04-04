@@ -4,8 +4,6 @@ require_once __DIR__.'/myapi/Products.php';
 
 header('Content-Type: application/json');
 
-$prodObj = new Products('marketzone');
-
 $response = [
     'status' => 'error',
     'message' => 'Error en validación'
@@ -22,39 +20,38 @@ try {
 
     // Validación básica del nombre
     if (empty($nombre) || strlen($nombre) > 100) {
-        $response['message'] = 'Nombre inválido (debe tener entre 1 y 100 caracteres)';
+        $response['message'] = 'Nombre inválido (1-100 caracteres)';
         echo json_encode($response);
         exit;
     }
 
-    // Consulta preparada para evitar SQL injection
+    // Crear nueva instancia para cada validación
+    $prodObj = new Products('marketzone');
+    
+    // Consulta preparada para verificar nombre
     if ($excludeId) {
         $sql = "SELECT COUNT(*) as count FROM productos WHERE nombre = ? AND id != ? AND eliminado = 0";
-    } else {
-        $sql = "SELECT COUNT(*) as count FROM productos WHERE nombre = ? AND eliminado = 0";
-    }
-
-    $stmt = $prodObj->conexion->prepare($sql);
-    
-    if (!$stmt) {
-        throw new Exception('Error al preparar la consulta');
-    }
-
-    // Bind parameters
-    if ($excludeId) {
+        $stmt = $prodObj->conexion->prepare($sql);
+        if (!$stmt) {
+            throw new Exception('Error al preparar la consulta con exclusión');
+        }
         $stmt->bind_param("si", $nombre, $excludeId);
     } else {
+        $sql = "SELECT COUNT(*) as count FROM productos WHERE nombre = ? AND eliminado = 0";
+        $stmt = $prodObj->conexion->prepare($sql);
+        if (!$stmt) {
+            throw new Exception('Error al preparar la consulta');
+        }
         $stmt->bind_param("s", $nombre);
     }
 
-    // Ejecutar consulta
     if (!$stmt->execute()) {
         throw new Exception('Error al ejecutar la consulta');
     }
 
-    // Obtener resultados
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
+    $stmt->close();
 
     if ($row['count'] > 0) {
         $response['message'] = 'Ya existe un producto con este nombre';
@@ -65,12 +62,11 @@ try {
         ];
     }
 
-    $stmt->close();
 } catch (Exception $e) {
     $response['message'] = $e->getMessage();
 } finally {
-    // Cerrar conexión si es necesario
-    if (isset($prodObj->conexion)) {
+    // Cerrar conexión solo si existe
+    if (isset($prodObj) && isset($prodObj->conexion)) {
         $prodObj->conexion->close();
     }
 }

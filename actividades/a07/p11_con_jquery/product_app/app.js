@@ -85,45 +85,14 @@ $(document).ready(function () {
         $(input).removeClass("is-invalid");
     }
 
-    function validarNombreExistente(nombre) {
-        $.ajax({
-            url: './backend/product-validate-name.php',
-            type: 'GET',
-            data: { nombre: nombre },
-            success: function (response) {
-                let data = JSON.parse(response);
-                let estadoNombre = $(".estado-nombre");
-    
-                if (data.status === 'error') {
-                    estadoNombre.text("❌ " + data.message).css("color", "red");
-                } else {
-                    estadoNombre.text("✅ " + data.message).css("color", "green");
-                }
-            },
-            error: function () {
-                console.log("Error en la validación del nombre.");
-            }
-        });
-    }
-    
-    // Vincular la validación al evento input (cuando el usuario escribe)
-    $("#nombre").on("input", function () {
-        let nombre = $(this).val().trim();
-        if (nombre.length >= 3) { // Validar solo si el nombre tiene 3 o más caracteres
-            validarNombreExistente(nombre);
-        } else {
-            $(".estado-nombre").text("").css("color", ""); // Limpiar el mensaje si el nombre es muy corto
-        }
-    });
-
     function validarNombreExistente(nombre, currentId = null) {
         return new Promise((resolve) => {
             const estadoNombre = $(".estado-nombre");
             
             // Validación básica antes de hacer la petición
             if (!nombre || nombre.length > 100) {
-                estadoNombre.text("❌ Nombre inválido").css("color", "red");
-                resolve(false);
+                estadoNombre.text("❌ Nombre inválido (1-100 caracteres)").css("color", "red");
+                resolve({ valido: false, mensaje: "Nombre inválido" });
                 return;
             }
     
@@ -132,33 +101,60 @@ $(document).ready(function () {
                 type: 'GET',
                 data: { 
                     nombre: nombre,
-                    excludeId: currentId
+                    excludeId: currentId // Asegúrate de enviar el ID actual
                 },
                 success: function(response) {
                     try {
                         const data = typeof response === 'string' ? JSON.parse(response) : response;
                         
+                        if (!data) {
+                            throw new Error("Respuesta vacía del servidor");
+                        }
+    
                         if (data.status === "success") {
                             estadoNombre.text("✅ " + data.message).css("color", "green");
-                            resolve(true);
+                            resolve({ valido: true, mensaje: data.message });
                         } else {
                             estadoNombre.text("❌ " + data.message).css("color", "red");
-                            resolve(false);
+                            resolve({ valido: false, mensaje: data.message });
                         }
                     } catch (e) {
-                        console.error("Error parsing validation response:", e);
+                        console.error("Error parsing validation response:", e, "Response:", response);
                         estadoNombre.text("⚠️ Error en validación").css("color", "orange");
-                        resolve(true); // Permitir continuar si falla la validación
+                        resolve({ valido: true, mensaje: "Error en validación" });
                     }
                 },
                 error: function(xhr) {
                     console.error("Error en validación:", xhr.statusText);
                     estadoNombre.text("⚠️ Servicio no disponible").css("color", "orange");
-                    resolve(true); // Permitir continuar si falla la validación
+                    resolve({ valido: true, mensaje: "Servicio no disponible" });
                 }
             });
         });
     }
+    
+    // Vincular la validación al evento input (cuando el usuario escribe)
+    let validacionTimeout;
+    $("#nombre").on("input", function() {
+        clearTimeout(validacionTimeout);
+        const nombre = $(this).val().trim();
+        const estadoNombre = $(".estado-nombre");
+    
+        if (nombre.length === 0) {
+            estadoNombre.text("").css("color", "");
+        return;
+        }
+    
+        if (nombre.length < 3) {
+            estadoNombre.text("Mínimo 3 caracteres").css("color", "gray");
+        return;
+        }
+    
+        // Usar timeout para evitar múltiples llamadas mientras se escribe
+        validacionTimeout = setTimeout(async () => {
+            await validarNombreExistente(nombre, $('#productId').val() || null);
+        }, 500);
+    });
     
     // Función de validación de nombre actualizada
     async function validarNombre() {
@@ -168,9 +164,15 @@ $(document).ready(function () {
         const currentId = $('#productId').val() || null;
     
         // Validación básica
-        if (!nombre || nombre.length > 100) {
-            mostrarError("#nombre", "Nombre inválido (1-100 caracteres)");
-            estadoNombre.text("❌ Nombre inválido").css("color", "red");
+        if (!nombre) {
+            mostrarError("#nombre", "El nombre es requerido");
+            estadoNombre.text("❌ El nombre es requerido").css("color", "red");
+            return false;
+        }
+        
+        if (nombre.length > 100) {
+            mostrarError("#nombre", "Máximo 100 caracteres");
+            estadoNombre.text("❌ Máximo 100 caracteres").css("color", "red");
             return false;
         }
     
@@ -181,15 +183,16 @@ $(document).ready(function () {
             return true;
         }
     
-        // Validar existencia del nombre (solo si es necesario)
-        const valido = await validarNombreExistente(nombre, currentId);
+        // Validar existencia del nombre
+        const { valido, mensaje } = await validarNombreExistente(nombre, currentId);
+        
         if (!valido) {
-            mostrarError("#nombre", "El nombre ya existe");
+            mostrarError("#nombre", mensaje);
+            return false;
         } else {
             limpiarError("#nombre");
+            return true;
         }
-        
-        return valido;
     }
     
 
@@ -270,19 +273,24 @@ $(document).ready(function () {
     }
 
     // Validar el formulario completo
-    function validarFormulario() {
-        return (
-            validarNombre() &&
-            validarModelo() &&
-            validarPrecio() &&
-            validarUnidades() &&
-            validarMarca() &&
+    async function validarFormulario() {
+        // Validar todos los campos sincrónicos primero
+        const validaciones = [
+            await validarNombre(), // Ahora esperamos esta validación
+            validarModelo(),
+            validarPrecio(),
+            validarUnidades(),
+            validarMarca(),
             validarImagen()
-        );
+        ];
+        
+        return validaciones.every(v => v === true);
     }
 
     // Vincular validaciones al evento blur
-    $("#nombre").on("blur", validarNombre);
+    $("#nombre").on("blur", async function() {
+        await validarNombre();
+    });
     $("#modelo").on("blur", validarModelo);
     $("#precio").on("blur", validarPrecio);
     $("#unidades").on("blur", validarUnidades);
@@ -290,10 +298,12 @@ $(document).ready(function () {
     $("#imagen").on("blur", validarImagen);
 
     // Enviar formulario
-    $('#product-form').submit(e => {
+    $('#product-form').submit(async function(e) {
         e.preventDefault();
-    
-        if (!validarFormulario()) {
+        
+        const formularioValido = await validarFormulario();
+        
+        if (!formularioValido) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -497,61 +507,71 @@ $(document).ready(function () {
 
     // Editar producto
     $(document).on('click', '.product-item', function(e) {
-    e.preventDefault();
-    
-    const element = $(this).closest('tr');
-    const id = element.attr('productId');
-    
-    // Mostrar carga mientras se obtiene el producto
-    Swal.fire({
-        title: 'Cargando producto...',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-            
-            $.ajax({
-                url: './backend/product-single.php',
-                type: 'POST', // Puedes usar POST o GET
-                data: { id: id },
-                dataType: 'json',
-                success: function(response) {
-                    Swal.close();
-                    
-                    if(response.status === 'success' && response.data) {
-                        const product = response.data;
+        e.preventDefault();
+        
+        const element = $(this).closest('tr');
+        const id = element.attr('productId');
+        
+        // Mostrar carga mientras se obtiene el producto
+        Swal.fire({
+            title: 'Cargando producto...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+                
+                $.ajax({
+                    url: './backend/product-single.php',
+                    type: 'POST',
+                    data: { id: id },
+                    dataType: 'json',
+                    success: function(response) {
+                        Swal.close();
                         
-                        // Rellenar formulario
-                        $('#nombre').val(product.nombre).data("original", product.nombre);
-                        $('#marca').val(product.marca);
-                        $('#modelo').val(product.modelo);
-                        $('#precio').val(parseFloat(product.precio).toFixed(2));
-                        $('#detalles').val(product.detalles);
-                        $('#unidades').val(product.unidades);
-                        $('#imagen').val(product.imagen);
-                        $('#productId').val(product.id);
-                        
-                        // Cambiar a modo edición
-                        edit = true;
-                        $('button.btn-primary').text("Modificar Producto");
-                        
-                        // Resetear validación
-                        limpiarError("#nombre");
-                        $(".estado-nombre").text("✅ Modo edición").css("color", "green");
-                    } else {
+                        if(response.status === 'success' && response.data) {
+                            const product = response.data;
+                            
+                            // Rellenar formulario
+                            $('#nombre').val(product.nombre).data("original", product.nombre);
+                            $('#marca').val(product.marca);
+                            $('#modelo').val(product.modelo);
+                            $('#precio').val(parseFloat(product.precio).toFixed(2));
+                            $('#detalles').val(product.detalles);
+                            $('#unidades').val(product.unidades);
+                            $('#imagen').val(product.imagen);
+                            $('#productId').val(product.id);
+                            
+                            // Cambiar a modo edición
+                            edit = true;
+                            $('button.btn-primary').text("Modificar Producto");
+                            
+                            // Resetear validación
+                            limpiarError("#nombre");
+                            $(".estado-nombre").text("✅ Modo edición").css("color", "green");
+                            
+                            // Actualizar evento input para incluir el ID actual
+                            $("#nombre").off("input").on("input", function() {
+                                const nombre = $(this).val().trim();
+                                if (nombre.length >= 3) {
+                                    validarNombreExistente(nombre, product.id);
+                                } else {
+                                    $(".estado-nombre").text("Mínimo 3 caracteres").css("color", "gray");
+                                }
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error',
+                                response.message || 'No se pudo cargar el producto',
+                                'error'
+                            );
+                        }
+                    },
+                    error: function(xhr) {
                         Swal.fire(
                             'Error',
-                            response.message || 'No se pudo cargar el producto',
+                            'No se pudo cargar el producto',
                             'error'
                         );
-                    }
-                },
-                error: function(xhr) {
-                    Swal.fire(
-                        'Error',
-                        'No se pudo cargar el producto',
-                        'error'
-                    );
-                    console.error("Error al cargar producto:", xhr.responseText);
+                        console.error("Error al cargar producto:", xhr.responseText);
                     }
                 });
             }
