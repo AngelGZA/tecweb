@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-7"?>
+<CatalagoVOD>
+    <cuenta correo="angelalfonso108@gmail.com">
+        <perfiles>
+            <perfil usuario="Alfonso" idioma="Español"/>
+            <perfil usuario="Oliver" idioma="Portugues"/>
+        </perfiles>
+    </cuenta>
+    <contenido>
+        <peliculas>
+            <genero nombre="Terror">
+                <titulo>
+                    <nombre duracion="135 min">Angel Engine</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="85 min">Terrifier</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="140 min">La Sustancia</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="110 min">Cinco Noches en el Alfredo's</nombre>
+                </titulo>
+            </genero>
+            <genero nombre="Romantico">
+                <titulo>
+                    <nombre duracion="123 min">Cuestion de tiempo</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="126 min">PD: Te amo</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="102 min">Los imprevistos del amor</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="90 min">Mi primer amor</nombre>
+                </titulo>
+            </genero>
+        </peliculas>
+
+        <programas>
+            <genero>
+                <nombre>Comedia</nombre>
+                <titulo>
+                    <nombre duracion="279 episodios">The Big Bang Theory</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="151 episodios">Malcolm in the middle</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="208 episodios">How i meet mother?</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="201 episodios">The Office</nombre>
+                </titulo>
+            </genero>
+            <genero>
+                <nombre>Dramaticas</nombre>
+                <titulo>
+                    <nombre duracion="217 episodios">Smallville</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="9 episodios">The Last of Us</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="16 episodios">Casate con mi esposo</nombre>
+                </titulo>
+                <titulo>
+                    <nombre duracion="62 episodios">Rompiendo el malo</nombre>
+                </titulo>
+            </genero>
+        </programas>
+    </contenido>
+</CatalagoVOD>

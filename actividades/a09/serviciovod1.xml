@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-7"?>
+<CatalagoVOD>
+    <cuenta>
+        <correo>angelalfonso108@gmail.com</correo>
+        <perfiles>
+            <perfil>
+                <usuario>Alfonso</usuario>
+                <idioma>Español</idioma>
+            </perfil>
+            <perfil>
+                <usuario>Oliver</usuario>
+                <idioma>Portugues</idioma>
+            </perfil>
+        </perfiles>
+    </cuenta>
+    <contenido>
+        <peliculas>
+            <genero>
+                <nombre>Terror</nombre>
+                <titulo>
+                    <nombre>Angel Engine</nombre>
+                    <duracion>135 min</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>Terrifier</nombre>
+                    <duracion>85 min</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>La Sustancia</nombre>
+                    <duracion>140 min</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>Cinco Noches en el Alfredo's</nombre>
+                    <duracion>110 min</duracion>
+                </titulo>
+            </genero>
+            <genero>
+                <nombre>Romantico</nombre>
+                <titulo>
+                    <nombre>Cuestion de tiempo</nombre>
+                    <duracion>123 min</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>PD: Te amo</nombre>
+                    <duracion>126 min</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>Los imprevistos del amor</nombre>
+                    <duracion>102 min</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>Mi primer amor</nombre>
+                    <duracion>90 min</duracion>
+                </titulo>
+            </genero>
+        </peliculas>
+
+        <programas>
+            <genero>
+                <nombre>Comedia</nombre>
+                <titulo>
+                    <nombre>The Big Bang Theory</nombre>
+                    <duracion>279 episodios</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>Malcolm in the middle</nombre>
+                    <duracion>151 episodios</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>How i meet mother?</nombre>
+                    <duracion>208 episodios</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>The Office</nombre>
+                    <duracion>201 episodios</duracion>
+                </titulo>
+            </genero>
+            <genero>
+                <nombre>Dramaticas</nombre>
+                <titulo>
+                    <nombre>Smallville</nombre>
+                    <duracion>217 episodios</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>The Last of Us</nombre>
+                    <duracion>9 episodios</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>Casate con mi esposo</nombre>
+                    <duracion>16 episodios</duracion>
+                </titulo>
+                <titulo>
+                    <nombre>Rompiendo el malo</nombre>
+                    <duracion>62 episodios</duracion>
+                </titulo>
+            </genero>
+        </programas>
+    </contenido>
+</CatalagoVOD>
