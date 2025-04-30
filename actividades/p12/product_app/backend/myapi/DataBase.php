@@ -5,6 +5,7 @@ abstract class DataBase {
     protected $conexion;
     protected $data=NULL;
     
+    
     public function __construct($db, $user='root', $pass='Mitelefono12') {
         $this->conexion = @mysqli_connect(
             'localhost', 

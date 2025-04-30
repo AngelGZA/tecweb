@@ -10,7 +10,7 @@ use TECWEB\MYAPI\CREATE\Create as Create;
 use TECWEB\MYAPI\UPDATE\Update as Update;
 
 $app = AppFactory::create();
-$app->addBodyParsingMiddleware(); // Para parsear JSON automáticamente
+$app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
@@ -23,7 +23,7 @@ $app->add(function ($request, $handler) {
         ->withHeader('Content-Type', 'application/json');
 });
 
-// Lista todos los productos
+// Listar todos los productos
 $app->get('/products', function (Request $request, Response $response) {
     $prodObj = new Read('marketzone');
     $prodObj->list();
