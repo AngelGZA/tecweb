@@ -14,10 +14,8 @@ $app->addBodyParsingMiddleware(); // Para parsear JSON automáticamente
 $app->addRoutingMiddleware();
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
-// Configura la ruta base
 $app->setBasePath('/tecweb/actividades/p12/product_app/backend');
 
-// HEADER para CORS (permite peticiones desde el frontend)
 $app->add(function ($request, $handler) {
     $response = $handler->handle($request);
     return $response
@@ -25,7 +23,6 @@ $app->add(function ($request, $handler) {
         ->withHeader('Content-Type', 'application/json');
 });
 
-// Ruta GET /products (Listar todos o buscar)
 // Lista todos los productos
 $app->get('/products', function (Request $request, Response $response) {
     $prodObj = new Read('marketzone');
